@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
 
     private Animator animator;
 
+    private Coroutine moveCoroutine;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -21,25 +23,34 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!isMoving)
+        input.x = Input.GetAxisRaw("Horizontal");
+        input.y = Input.GetAxisRaw("Vertical");
+
+        if (input != Vector2.zero)
         {
-            input.x = Input.GetAxisRaw("Horizontal");
-            input.y = Input.GetAxisRaw("Vertical");
+            animator.SetFloat("moveX", input.x);
+            animator.SetFloat("moveY", input.y);
 
-            if (input != Vector2.zero)
+            if (moveCoroutine != null)
             {
-                animator.SetFloat("moveX", input.x);
-                animator.SetFloat("moveY", input.y);
-
-                var targetPosition = transform.position;
-                targetPosition.x += input.x;
-                targetPosition.y += input.y;
-
-                StartCoroutine(Move(targetPosition));
+                StopCoroutine(moveCoroutine);
             }
+
+            var targetPosition = transform.position + new Vector3(input.x, input.y, 0f);
+            moveCoroutine = StartCoroutine(Move(targetPosition));
         }
+        else if (isMoving)
+        {
+            if (moveCoroutine != null)
+            {
+                StopCoroutine(moveCoroutine);
+            }
+            isMoving = false;
+        }
+
         animator.SetBool("isMoving", isMoving);
     }
+
 
     IEnumerator Move(Vector3 targetPos) 
     {
@@ -50,8 +61,6 @@ public class PlayerController : MonoBehaviour
             yield return null; 
         }
         transform.position = targetPos;
-
         isMoving = false;
     }
-
 }
