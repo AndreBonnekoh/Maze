@@ -28,6 +28,15 @@ public class PlayerController : MonoBehaviour
 
         if (input != Vector2.zero)
         {
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                moveSpeed = 4;
+            }
+            else
+            {
+                moveSpeed = 2;
+            }
+
             animator.SetFloat("moveX", input.x);
             animator.SetFloat("moveY", input.y);
 
